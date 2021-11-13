@@ -39,6 +39,8 @@ brew services start mongodb-community@5.0
 pip3 install pymongo
 import pymongo
 mongo_client = pymongo.MongoClient('127.0.0.1', 27017)
+mongo_db = mongo_client['股票']
+mongo_collection = mongo_db['指数']
 mongo_collection.insert_one(info) # info是dict
 mongo_collection.insert_many(insert_list)
 ```
@@ -46,5 +48,10 @@ mongo_collection.insert_many(insert_list)
 ```
 select_item = mongo_collection.find_one(find_condition, projection= {'_id':False, 'name':True, 'num':True})# dict
 
+4. 删除
+```
+mongo_collection.delete_many({}) # 删除collection所有
+mongo_collection.drop() 
+```
 
 

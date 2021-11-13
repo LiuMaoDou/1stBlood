@@ -18,3 +18,10 @@ df = pd.DataFrame(lst, columns =['Name', 'Age'])
 ```python
 df.to_excel('test.xlsx')
 ```
+![image](https://user-images.githubusercontent.com/65071754/141647846-9f91cdfd-f5c2-4649-9d20-bb815379b90b.png)
+
+3. to_dict
+```python
+df.to_dict('series')
+```
+![image](https://user-images.githubusercontent.com/65071754/141647757-e0049612-c79a-4953-80fb-24681ffa50e7.png)

@@ -14,11 +14,12 @@ Ctrl+R
 ```python
 df = pd.DataFrame(lst, columns =['Name', 'Age'])
 ```
+![image](https://user-images.githubusercontent.com/65071754/141647846-9f91cdfd-f5c2-4649-9d20-bb815379b90b.png)
+
 2. to_excel 
 ```python
 df.to_excel('test.xlsx')
 ```
-![image](https://user-images.githubusercontent.com/65071754/141647846-9f91cdfd-f5c2-4649-9d20-bb815379b90b.png)
 
 3. to_dict
 ```python

@@ -49,6 +49,12 @@ mongo_collection.insert_many(insert_list)
 ```
 select_item = mongo_collection.find_one(find_condition, projection= {'_id':False, 'name':True, 'num':True})# dict
 
+find_condition = {
+    '日期' : {'$gte':datetime.datetime(2021,11,13), '$lt':datetime.datetime(2021,11,14)}
+}
+select_item = mongo_collection.find_one(find_condition)
+```
+
 4. 删除
 ```
 mongo_collection.delete_many({}) # 删除collection所有

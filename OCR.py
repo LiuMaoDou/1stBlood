@@ -4,6 +4,9 @@ from aip import AipOcr  # baidu-aip
 import os
 import re
 import time
+import pyperclip
+
+os.chdir('/Users/**/Desktop/')
 
 
 def input_file_path():
@@ -38,14 +41,15 @@ if __name__ == "__main__":
     pic, output = input_file_path()
 
     client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
-    with open(output, 'a+') as txt:
-        image = get_file_content(pic)
-        text = client.basicAccurate(image)
-        result = text["words_result"]
-        for i in result:
-            txt.write(i["words"])
-            txt.write('\n')
+    image = get_file_content(pic)
+    text = client.basicAccurate(image)
+    result = text["words_result"]
+    lst = ''
+    for i in result:
+        lst = lst + i["words"] + '\n'
 
+    pyperclip.copy(lst)
+    print(pyperclip.paste())
     now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     now2 = time.time()
     now3 = now2 - now1

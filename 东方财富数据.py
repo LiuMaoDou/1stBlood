@@ -6,7 +6,8 @@ import datetime
 import pymongo
 
 mongo_client = pymongo.MongoClient('127.0.0.1', 27017)
-today = datetime.date.today().strftime('%Y%m%d')
+# today = datetime.date.today().strftime('%Y-%m-%d')
+today = datetime.datetime.today()
 
 
 def stock_index():

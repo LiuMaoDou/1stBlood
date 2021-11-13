@@ -29,9 +29,10 @@ df.to_dict('series')
 
 
 ## pymongo
-1. 启动数据库
+1. 启动/关闭数据库
 ```
 brew services start mongodb-community@5.0
+brew services stop mongodb-community@5.0
 ```
 2. 插入
 

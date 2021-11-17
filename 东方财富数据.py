@@ -8,10 +8,9 @@ import time
 
 mongo_client = pymongo.MongoClient('127.0.0.1', 27017)
 mongo_db = mongo_client['股票']
-# today = datetime.date.today().strftime('%Y-%m-%d')
-
-# today = datetime.datetime.today()
-today = datetime.datetime(year=2021, month=11, day=15, hour=0, minute=0, second=0)
+today_iso = datetime.date.today().strftime('%Y-%m-%d')
+today = datetime.datetime.fromisoformat(today_iso)
+# today = datetime.datetime(year=2021, month=11, day=15, hour=0, minute=0, second=0)
 
 
 def timer(function):
@@ -183,6 +182,6 @@ def group_data():
 
 
 if __name__ == "__main__":
-    # stock_index()
-    # daily_data()
+    stock_index()
+    daily_data()
     group_data()

@@ -72,6 +72,15 @@ mongo_collection.delete_many({}) # 删除collection所有
 mongo_collection.drop() 
 ```
 
+5. 更新
+```
+mongo_collection.update_one({"日期": {'$gte':datetime.datetime(2021,11,16,0,1), '$lt':datetime.datetime(2021,11,17)}},
+                        {'$set' : {'日期':datetime.datetime(2021, 11, 16, 0, 0)}})
+
+mongo_collection.update_many({"日期": {'$gte':datetime.datetime(2021,11,16,0,1), '$lt':datetime.datetime(2021,11,17)}},
+                        {'$set' : {'日期':datetime.datetime(2021, 11, 16, 0, 0)}})
+```
+
 ## matplotlib.pyplot
 
 

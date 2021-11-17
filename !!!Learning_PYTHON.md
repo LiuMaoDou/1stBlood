@@ -27,6 +27,16 @@ df.to_dict('series')
 ```
 ![image](https://user-images.githubusercontent.com/65071754/141647757-e0049612-c79a-4953-80fb-24681ffa50e7.png)
 
+4. from_dict
+```
+pd.DataFrame.from_dict(data, orient='index', columns=['A', 'B', 'C', 'D'])
+df = pd.DataFrame(select_item[0],index=[0]) # 如果只有一行
+
+df = pd.DataFrame(columns=['名称','日期','最新价','涨跌幅'])
+for i in select_item:
+    df = df.append(i, ignore_index=True)
+```
+
 
 ## pymongo
 1. 启动/关闭数据库
@@ -47,12 +57,13 @@ mongo_collection.insert_many(insert_list)
 ```
 3. 查询
 ```
-select_item = mongo_collection.find_one(find_condition, projection= {'_id':False, 'name':True, 'num':True})# dict
-
 find_condition = {
     '日期' : {'$gte':datetime.datetime(2021,11,13), '$lt':datetime.datetime(2021,11,14)}
 }
 select_item = mongo_collection.find_one(find_condition)
+select_item = mongo_collection.find_one(find_condition, projection= {'_id':False, 'name':True, 'num':True})# dict
+select_item = mongo_collection.find(find_condition,{'_id':0})
+
 ```
 
 4. 删除

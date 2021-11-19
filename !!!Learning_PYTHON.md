@@ -36,7 +36,14 @@ df = pd.DataFrame(columns=['名称','日期','最新价','涨跌幅'])
 for i in select_item:
     df = df.append(i, ignore_index=True)
 ```
-
+5. column改名
+```python
+df.rename(columns={'最新价':'上证指数'},inplace=False)
+```
+6. 某一列当index
+```python
+df.set_index('日期',inplace=True)
+```
 
 ## pymongo
 1. 启动/关闭数据库

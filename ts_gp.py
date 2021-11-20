@@ -49,6 +49,7 @@ def ts_date(ttoday=True):
     return today, ysday
 
 
+@timer
 def create_excel(bookname, sheetname, title, df, df_value):
     print("---Excel Started---")
     # app = xw.App(visible=True, add_book=False)
@@ -74,7 +75,7 @@ def create_excel(bookname, sheetname, title, df, df_value):
     print("---Excel Finished---")
 
 
-
+@timer
 def daily_pct(date):
     daily = pro.daily(trade_date=date, fields="ts_code,pct_chg,close,amount")
     daily2 = daily.set_index('ts_code')
@@ -116,22 +117,26 @@ def reven(year, Q):
     # reven_value2 = reven_value.set_index('ts_code').drop_duplicates()
     # reven_value2.drop_duplicates(subset=['ts_code'], keep='last', inplace=True)
     reven_value2 = reven_value2[~reven_value2.index.duplicated(keep='last')]
-    create_excel("股票.xlsx", "股票", str(year)+Q+"-收入", reven_value2, "total_revenue")
-    create_excel("股票.xlsx", "股票", str(year)+Q+"-利润", reven_value2, "n_income_attr_p")
+    create_excel("股票.xlsx", "股票", str(year) + Q + "-收入", reven_value2, "total_revenue")
+    create_excel("股票.xlsx", "股票", str(year) + Q + "-利润", reven_value2, "n_income_attr_p")
 
 
 if __name__ == "__main__":
     print("---Starting---")
-    # today, ysday = ts_date()
-    # print("Today is", today)
+    today, ysday = ts_date()
+    print("Today is", today)
     # # daily_pct(today)
     # daily_pct("20211104")
+
+    ### PE和市值
     # s_pe = pro.daily_basic(ts_code='', trade_date=today, fields='ts_code,pe_ttm,total_mv')
     # s_pe = s_pe.set_index('ts_code')
-    # create_excel("股票.xlsx", "股票", str(today)+"-PE", s_pe, "pe_ttm")
-    # create_excel("股票.xlsx", "股票", str(today)+"-市值", s_pe, "total_mv")
-    for _ in ["Q1", "Q2", "Q3", "Q4"]:
-        reven("2020", _)
-        reven("2021", _)
+    # create_excel("股票.xlsx", "股票", "PE", s_pe, "pe_ttm")
+    # create_excel("股票.xlsx", "股票", "市值", s_pe, "total_mv")
+    ### PE和市值
+
+    # for _ in ["Q1", "Q2", "Q3", "Q4"]:
+    #     reven("2020", _)
+    #     reven("2021", _)
 
     print("---Finished---")

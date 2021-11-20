@@ -3,9 +3,32 @@ import pandas as pd
 import datetime
 import os
 import xlwings as xw
+import time
 
 pro = ts.pro_api('**')
-os.chdir('/Users/**/Documents/03_Python/股票')
+os.chdir('/Users/**/Documents/03 Python/股票')
+
+
+def timer(function):
+    """
+    装饰器函数timer
+    :param function:想要计时的函数
+    :return:
+    """
+
+    def wrapper(*args, **kwargs):
+        time_start = time.time()
+        res = function(*args, **kwargs)
+        cost_time = time.time() - time_start
+        print("【%s】运行时间：【%s】秒" % (function.__name__, cost_time))
+        return res
+
+    return wrapper
+
+
+def gp_list():
+    data = pro.stock_basic(exchange='', list_status='L', fields='ts_code,symbol,name,industry,market,list_date')
+    data.to_excel('股票.xlsx')
 
 
 def ts_date(ttoday=True):
@@ -27,6 +50,7 @@ def ts_date(ttoday=True):
 
 
 def create_excel(bookname, sheetname, title, df, df_value):
+    print("---Excel Started---")
     # app = xw.App(visible=True, add_book=False)
     # app.display_alerts = False
     # app.screen_updating = False
@@ -48,6 +72,7 @@ def create_excel(bookname, sheetname, title, df, df_value):
     wb.save(bookname)
     # wb.close()
     print("---Excel Finished---")
+
 
 
 def daily_pct(date):
@@ -81,30 +106,32 @@ def daily_pct(date):
 # wb.save(bookname)
 # print('finished')
 
-
-def reven(Q):
-    q = {"Q1": "20210331", "Q2": "20210630", "Q3": "20210930", "Q4": "20211231"}
+@timer
+def reven(year, Q):
+    q = {"Q1": str(year) + "0331", "Q2": str(year) + "0630",
+         "Q3": str(year) + "0930", "Q4": str(year) + "1231"}
     reven_value = pro.income_vip(period=q[Q], fields='ts_code,ann_date,f_ann_date,end_date,total_revenue,'
                                                      'n_income_attr_p')
     reven_value2 = reven_value.set_index('ts_code')
     # reven_value2 = reven_value.set_index('ts_code').drop_duplicates()
     # reven_value2.drop_duplicates(subset=['ts_code'], keep='last', inplace=True)
     reven_value2 = reven_value2[~reven_value2.index.duplicated(keep='last')]
-    create_excel("股票.xlsx", "股票", "收入", reven_value2, "total_revenue")
-    create_excel("股票.xlsx", "股票", "利润", reven_value2, "n_income_attr_p")
+    create_excel("股票.xlsx", "股票", str(year)+Q+"-收入", reven_value2, "total_revenue")
+    create_excel("股票.xlsx", "股票", str(year)+Q+"-利润", reven_value2, "n_income_attr_p")
 
 
 if __name__ == "__main__":
     print("---Starting---")
-    today, ysday = ts_date()
-    print("Today is", today)
-    # daily_pct(today)
-    daily_pct("20211104")
+    # today, ysday = ts_date()
+    # print("Today is", today)
+    # # daily_pct(today)
+    # daily_pct("20211104")
     # s_pe = pro.daily_basic(ts_code='', trade_date=today, fields='ts_code,pe_ttm,total_mv')
     # s_pe = s_pe.set_index('ts_code')
     # create_excel("股票.xlsx", "股票", str(today)+"-PE", s_pe, "pe_ttm")
     # create_excel("股票.xlsx", "股票", str(today)+"-市值", s_pe, "total_mv")
-    # reven("Q3")
-    # reven("Q2")
+    for _ in ["Q1", "Q2", "Q3", "Q4"]:
+        reven("2020", _)
+        reven("2021", _)
 
     print("---Finished---")

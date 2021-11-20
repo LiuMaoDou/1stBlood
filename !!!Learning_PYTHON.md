@@ -44,6 +44,16 @@ df.rename(columns={'最新价':'上证指数'},inplace=False)
 ```python
 df.set_index('日期',inplace=True)
 ```
+7. 重复值
+```python
+df.duplicated() #第一次重复的不算
+df.duplicated(keep='last') #最后一次重复的不算,默认是first
+df.duplicated(keep=False) #所有重复的都是True
+df.duplicated(subset=['B'], keep=False) #指定列检测
+df[df.duplicated()] #筛选重复值
+
+df.drop_duplicates()
+```
 
 ## pymongo
 1. 启动/关闭数据库

@@ -113,3 +113,4 @@ mongo_collection.update_many({"日期": {'$gte':datetime.datetime(2021,11,16,0,1
 ## matplotlib.pyplot
 
 
+data=json.dumps(payload) -- 字典转JSON

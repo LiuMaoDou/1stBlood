@@ -59,19 +59,19 @@ df.drop_duplicates()
 df1.append(df2)
 ```
 9. 数据筛选
-```
+```python
 df[df['end_date'=='20210930']]
 ```
 10. 修改列名
-```
+```python
 data.rename(columns={'ts_code':'symbol'},inplace=True)
 ```
 11. 数据合并
-```
+```python
 test = pd.merge(df_data,data, on = "symbol")
 ```
 12. 排序
-```
+```python
 test.sort_values("mkv",ascending=False)
 ```
 

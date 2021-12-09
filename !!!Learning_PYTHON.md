@@ -55,15 +55,25 @@ df[df.duplicated()] #筛选重复值
 df.drop_duplicates()
 ```
 8. pandas合并
-```df1.append(df2)```
+```python
+df1.append(df2)
+```
 9. 数据筛选
-```df[df['end_date'=='20210930']]```
+```
+df[df['end_date'=='20210930']]
+```
 10. 修改列名
-```data.rename(columns={'ts_code':'symbol'},inplace=True)```
+```
+data.rename(columns={'ts_code':'symbol'},inplace=True)
+```
 11. 数据合并
-```test = pd.merge(df_data,data, on = "symbol")```
+```
+test = pd.merge(df_data,data, on = "symbol")
+```
 12. 排序
-```test.sort_values("mkv",ascending=False)```
+```
+test.sort_values("mkv",ascending=False)
+```
 
 
 

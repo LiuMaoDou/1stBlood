@@ -11,7 +11,6 @@ pro = ts.pro_api('**')
 os.chdir('/Users/**/Documents/03 Python/股票')
 
 
-
 def timer(function):
     """
     装饰器函数timer
@@ -77,19 +76,22 @@ def create_excel(bookname, sheetname, title, df, df_value):
     print("---Excel Finished---")
 
 
-def create_excel_new(bookname, sheetname, title, df):
+def create_excel_new(bookname, sheetname, title, df, df_value):
     print("---Excel Started---")
     wb = xw.Book(bookname)
     sheet = wb.sheets[sheetname]
     num_col = sheet.range('A1').end('right').column
     num_row = sheet.range('A1').end('down').row
 
-    sheet.range((1, (num_col + 1))).options(index=False).value = df
+    df_gp = pd.read_excel(bookname)
+    df_merge = pd.merge(df_gp, df, how='outer', on="ts_code")
+
+    sheet.range((1, (num_col + 1))).options(index=False).value = df_merge[df_value]
     sheet.range((1, (num_col + 1))).value = title
     sheet.range((1, num_col), (num_row, num_col)).copy()
     sheet.range((1, (num_col + 1)), (num_row, num_col+1)).paste("formats")
     sheet.range((1, (num_col + 1)), (num_row, num_col + 1)).autofit()
-    
+
     wb.save(bookname)
     print("---Excel Finished---")
 
@@ -102,34 +104,9 @@ def daily_pct(date):
     # create_excel("股票.xlsx", "股票", date+"成交量", daily2, "amount")
 
 
-# def daily_pct(date, bookname='股票.xlsx', sheetname='股票'):
-#     daily = pro.daily(trade_date=date, fields="ts_code,pct_chg,close")
-#     daily2 = daily.set_index('ts_code')
-
-# xw.Book()
-# wb = xw.Book(bookname)
-# sheet = wb.sheets[sheetname]
-# num_col = sheet.range('A1').end('right').column
-# num_row = sheet.range('A1').end('down').row
-#
-# i = 2
-# sheet.range((1, (num_col + 1))).value = date
-#
-# while i < (num_row + 1):
-#     try:
-#         sheet.range((i, (num_col + 1))).value = daily2.at[sheet.range('A' + str(i)).value, 'pct_chg']
-#     except:
-#         sheet.range((i, (num_col + 1))).value = "NULL"
-#     i += 1
-#
-# wb.save(bookname)
-# print('finished')
-
 def daily_pct_new(date):
     daily = pro.daily(trade_date=date, fields="ts_code,pct_chg,close,amount")
-    df_gp = pd.read_excel('股票.xlsx')
-    df_merge = pd.merge(df_gp, daily, how='outer', on="ts_code")
-    create_excel_new("股票.xlsx", "股票", date+"-涨跌", df_merge['pct_chg'])
+    create_excel_new("股票.xlsx", "股票", date + "-涨跌", daily, 'pct_chg')
 
 
 def reven(year, Q):
@@ -147,21 +124,24 @@ def reven(year, Q):
 
 @timer
 def main():
+    today, ysday = ts_date()
+    print("Today is", today)
+
     # gp_list()
     # reven(2021, "Q3")
 
     ## PE和市值
-    # s_pe = pro.daily_basic(ts_code='', trade_date='20211215', fields='ts_code,pe_ttm,total_mv')
+    s_pe = pro.daily_basic(ts_code='', trade_date=today, fields='ts_code,pe_ttm,total_mv')
     # s_pe = s_pe.set_index('ts_code')
-    # create_excel("股票.xlsx", "股票", "PE", s_pe, "pe_ttm")
-    # create_excel("股票.xlsx", "股票", "市值", s_pe, "total_mv")
+    create_excel_new("股票.xlsx", "股票", "PE", s_pe, "pe_ttm")
+    create_excel_new("股票.xlsx", "股票", "市值", s_pe, "total_mv")
     ## PE和市值
 
-    # today, ysday = ts_date()
-    # print("Today is", today)
+
     # daily_pct(today)
+    # daily_pct_new(today)
     # daily_pct("20211215")
-    daily_pct_new("20211215")
+    # daily_pct_new("20211215")
 
 
 if __name__ == "__main__":
@@ -169,3 +149,4 @@ if __name__ == "__main__":
     main()
     messagebox.showinfo('股票', '...完成任务...')
     print("---Finished---")
+

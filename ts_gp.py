@@ -4,10 +4,11 @@ import datetime
 import os
 import xlwings as xw
 import time
+from tkinter import messagebox
+
 
 pro = ts.pro_api('**')
 os.chdir('/Users/**/Documents/03 Python/股票')
-
 
 def timer(function):
     """
@@ -49,7 +50,6 @@ def ts_date(ttoday=True):
     return today, ysday
 
 
-@timer
 def create_excel(bookname, sheetname, title, df, df_value):
     print("---Excel Started---")
     # app = xw.App(visible=True, add_book=False)
@@ -75,13 +75,27 @@ def create_excel(bookname, sheetname, title, df, df_value):
     print("---Excel Finished---")
 
 
-@timer
+def create_excel_new(bookname, sheetname, title, df):
+    print("---Excel Started---")
+    wb = xw.Book(bookname)
+    sheet = wb.sheets[sheetname]
+    num_col = sheet.range('A1').end('right').column
+
+    sheet.range((1, (num_col + 1))).options(index=False).value = df
+    # sheet.range('L1').options(index=False).value = df
+    sheet.range((1, (num_col + 1))).value = title
+
+
+    wb.save(bookname)
+    print("---Excel Finished---")
+
+
 def daily_pct(date):
     daily = pro.daily(trade_date=date, fields="ts_code,pct_chg,close,amount")
     daily2 = daily.set_index('ts_code')
-    create_excel("股票.xlsx", "股票", date, daily2, "pct_chg")
-    # create_excel("股票.xlsx", "股票", date, daily2, "close")
-    # create_excel("股票.xlsx", "股票", date, daily2, "amount")
+    create_excel("股票.xlsx", "股票", date+"-涨跌", daily2, "pct_chg")
+    # create_excel("股票.xlsx", "股票", date+"-收盘", daily2, "close")
+    # create_excel("股票.xlsx", "股票", date+"成交量", daily2, "amount")
 
 
 # def daily_pct(date, bookname='股票.xlsx', sheetname='股票'):
@@ -107,7 +121,13 @@ def daily_pct(date):
 # wb.save(bookname)
 # print('finished')
 
-@timer
+def daily_pct_new(date):
+    daily = pro.daily(trade_date=date, fields="ts_code,pct_chg,close,amount")
+    df_gp = pd.read_excel('股票.xlsx')
+    df_merge = pd.merge(df_gp, daily, how='outer', on="ts_code")
+    create_excel_new("股票.xlsx", "股票", date+"-涨跌", df_merge['pct_chg'])
+
+
 def reven(year, Q):
     q = {"Q1": str(year) + "0331", "Q2": str(year) + "0630",
          "Q3": str(year) + "0930", "Q4": str(year) + "1231"}
@@ -121,22 +141,28 @@ def reven(year, Q):
     create_excel("股票.xlsx", "股票", str(year) + Q + "-利润", reven_value2, "n_income_attr_p")
 
 
-if __name__ == "__main__":
-    print("---Starting---")
-    today, ysday = ts_date()
-    print("Today is", today)
-    # # daily_pct(today)
-    # daily_pct("20211104")
+@timer
+def main():
+    # gp_list()
+    # reven(2021, "Q3")
 
-    ### PE和市值
-    # s_pe = pro.daily_basic(ts_code='', trade_date=today, fields='ts_code,pe_ttm,total_mv')
+    ## PE和市值
+    # s_pe = pro.daily_basic(ts_code='', trade_date='20211215', fields='ts_code,pe_ttm,total_mv')
     # s_pe = s_pe.set_index('ts_code')
     # create_excel("股票.xlsx", "股票", "PE", s_pe, "pe_ttm")
     # create_excel("股票.xlsx", "股票", "市值", s_pe, "total_mv")
-    ### PE和市值
+    ## PE和市值
 
-    # for _ in ["Q1", "Q2", "Q3", "Q4"]:
-    #     reven("2020", _)
-    #     reven("2021", _)
+    # today, ysday = ts_date()
+    # print("Today is", today)
+    # daily_pct(today)
+    # daily_pct("20211215")
+    daily_pct_new("20211215")
 
+
+if __name__ == "__main__":
+    print("---Starting---")
+    main()
+    messagebox.showinfo('股票', '...完成任务...')
     print("---Finished---")
+

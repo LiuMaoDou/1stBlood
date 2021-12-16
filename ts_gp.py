@@ -10,6 +10,8 @@ from tkinter import messagebox
 pro = ts.pro_api('**')
 os.chdir('/Users/**/Documents/03 Python/股票')
 
+
+
 def timer(function):
     """
     装饰器函数timer
@@ -80,11 +82,12 @@ def create_excel_new(bookname, sheetname, title, df):
     wb = xw.Book(bookname)
     sheet = wb.sheets[sheetname]
     num_col = sheet.range('A1').end('right').column
+    num_row = sheet.range('A1').end('down').row
 
     sheet.range((1, (num_col + 1))).options(index=False).value = df
-    # sheet.range('L1').options(index=False).value = df
     sheet.range((1, (num_col + 1))).value = title
-
+    sheet.range((1, num_col), (num_row, num_col)).copy()
+    sheet.range((1, (num_col + 1)), (num_row, num_col+1)).paste("formats")
 
     wb.save(bookname)
     print("---Excel Finished---")
@@ -165,4 +168,3 @@ if __name__ == "__main__":
     main()
     messagebox.showinfo('股票', '...完成任务...')
     print("---Finished---")
-

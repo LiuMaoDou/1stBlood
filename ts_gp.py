@@ -88,7 +88,8 @@ def create_excel_new(bookname, sheetname, title, df):
     sheet.range((1, (num_col + 1))).value = title
     sheet.range((1, num_col), (num_row, num_col)).copy()
     sheet.range((1, (num_col + 1)), (num_row, num_col+1)).paste("formats")
-
+    sheet.range((1, (num_col + 1)), (num_row, num_col + 1)).autofit()
+    
     wb.save(bookname)
     print("---Excel Finished---")
 

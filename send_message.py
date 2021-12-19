@@ -9,9 +9,10 @@ from datetime import datetime, time
 os.chdir('/Users/**/Desktop')
 token = '**'
 
+
 headers = {
     'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/95.0.4638.69 Safari/537.36"} 
+                  "Chrome/95.0.4638.69 Safari/537.36"}
 
 df = pd.read_csv('message_source.csv')
 df.set_index('code', inplace=True)
@@ -20,17 +21,17 @@ df.set_index('code', inplace=True)
 class AMessage(object):
     def __init__(self):
         self._code_ = ""
-        self._codeList_ = []
+        self._codeList_ = df.index.to_list()
         # self._name_ = ""
         self._count_ = 0
 
-    def send_message(self):
+    def send_message(self, dic):
         flomo_data = {
-            'content': "关注: {code}-{name}".format(code=self._code_, name=df.at[self._code_,'name'])
+            'content': "关注: {data[code]}_{data[name]}_{data[pct_chg]}%_{data[qrr]}".format(data=dic)
         }
 
         wx_data = {
-            'text': '关注', 
+            'text': '关注',
             '{desp}'.format(desp=flomo_data['content']): "提醒"
         }
 
@@ -41,13 +42,21 @@ class AMessage(object):
 
     def get_tick(self):
         for code in self._codeList_:
+            name = df.at[code, 'name']
             url = "https://xueqiu.com/S/{}".format(code)
             text = requests.get(url=url, headers=headers)
             root = etree.HTML(text.text)
             qrr = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/table/tr[3]/td[1]//text()')[1]
             pct_chg = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/div[1]/div[1]/div[2]//text()')[0].split(" ")[2]
-            if pct_chg > 0 and qrr >= 4:
-                self.send_message()
+            pct_chg = pct_chg.replace('%', "")
+            print(name, " ", pct_chg, " ", qrr)
+            merge = {"code": code, "name": name, "pct_chg": pct_chg, "qrr": qrr}
+
+            if float(pct_chg) > 0 and float(qrr) >= 4:
+            # if float(pct_chg) < 0 and float(qrr) >= 1:
+                self.send_message(merge)
+                print(name, " ", "Message Sent")
+            # sleep(1)
 
     @property
     def count_(self):
@@ -65,6 +74,10 @@ if __name__ == '__main__':
         if ted.count_ == 95:
             break
 
+    # ted.get_tick()
+
     messagebox.showinfo('股票', '...完成任务...')
     print("---Finished---")
+    print("Cound_Left: ", (99 - ted.count_))
+
 

@@ -1,13 +1,70 @@
 import requests
-token = '***'
+import pandas as pd
+import os
+from lxml import etree
+from tkinter import messagebox
+from time import sleep
+from datetime import datetime, time
 
-flomo_data={
-'content':'测试:发送一条数据给你'
-}
+os.chdir('/Users/**/Desktop')
+token = '**'
 
-wx_data={
-'text':'你的标题', '{desp}'.format(desp=flomo_data['content']):'最大支持64KB的文字内容'
-}
+headers = {
+    'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/95.0.4638.69 Safari/537.36"} 
 
-requests.post('https://flomoapp.com/iwh/MjMyNTE1/b2a4807c1ab2855b7f65c745afb248ef/', data=flomo_data) 
-requests.post('http://wx.xtuis.cn/{token}.send'.format(token=token), data=wx_data) 
+df = pd.read_csv('message_source.csv')
+df.set_index('code', inplace=True)
+
+
+class AMessage(object):
+    def __init__(self):
+        self._code_ = ""
+        self._codeList_ = []
+        # self._name_ = ""
+        self._count_ = 0
+
+    def send_message(self):
+        flomo_data = {
+            'content': "关注: {code}-{name}".format(code=self._code_, name=df.at[self._code_,'name'])
+        }
+
+        wx_data = {
+            'text': '关注', 
+            '{desp}'.format(desp=flomo_data['content']): "提醒"
+        }
+
+        requests.post('https://flomoapp.com/iwh/MjMyNTE1/b2a4807c1ab2855b7f65c745afb248ef/', data=flomo_data)
+        requests.post('http://wx.xtuis.cn/{token}.send'.format(token=token), data=wx_data)
+        self._count_ = + 1
+        return self._count_
+
+    def get_tick(self):
+        for code in self._codeList_:
+            url = "https://xueqiu.com/S/{}".format(code)
+            text = requests.get(url=url, headers=headers)
+            root = etree.HTML(text.text)
+            qrr = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/table/tr[3]/td[1]//text()')[1]
+            pct_chg = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/div[1]/div[1]/div[2]//text()')[0].split(" ")[2]
+            if pct_chg > 0 and qrr >= 4:
+                self.send_message()
+
+    @property
+    def count_(self):
+        return self._count_
+
+
+if __name__ == '__main__':
+    ted = AMessage()
+
+    while datetime.now().time() < time(15, 0):
+        if time(11, 30) < datetime.now().time() < time(12, 55):
+            sleep(5400)
+
+        ted.get_tick()
+        if ted.count_ == 95:
+            break
+
+    messagebox.showinfo('股票', '...完成任务...')
+    print("---Finished---")
+

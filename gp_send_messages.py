@@ -14,15 +14,16 @@ headers = {
     'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) "
                   "Chrome/95.0.4638.69 Safari/537.36"}
 
+
 df = pd.read_csv('message_source.csv')
 df.set_index('code', inplace=True)
 
 
 class AMessage(object):
     def __init__(self):
+        self._df_ = df
         self._code_ = ""
-        self._codeList_ = df.index.to_list()
-        # self._name_ = ""
+        self._codeList_ = self._df_.index.to_list()
         self._count_ = 0
 
     def send_message(self, dic):
@@ -42,21 +43,24 @@ class AMessage(object):
 
     def get_tick(self):
         for code in self._codeList_:
-            name = df.at[code, 'name']
+            name = self._df_.at[code, 'name']
             url = "https://xueqiu.com/S/{}".format(code)
             text = requests.get(url=url, headers=headers)
             root = etree.HTML(text.text)
-            qrr = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/table/tr[3]/td[1]//text()')[1]
-            pct_chg = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/div[1]/div[1]/div[2]//text()')[0].split(" ")[2]
-            pct_chg = pct_chg.replace('%', "")
-            print(name, " ", pct_chg, " ", qrr)
+            qrrini = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/table/tr[3]//text()')
+            qrr = qrrini[qrrini.index('量比：')+1]
+            pct_chgini = root.xpath('/html/body/div[1]/div[2]/div[2]/div[4]/div[1]/div[1]/div[2]//text()')
+            pct_chg = pct_chgini[0].split(" ")[2].replace('%', "")
+            print("{0:{3}>4}\t{1:>5}%\t{2:>3}".format(name, pct_chg, qrr, chr(12288)))
             merge = {"code": code, "name": name, "pct_chg": pct_chg, "qrr": qrr}
 
             if float(pct_chg) > 0 and float(qrr) >= 4:
-            # if float(pct_chg) < 0 and float(qrr) >= 1:
+            # if float(pct_chg) < -3 and float(qrr) >= 1:
                 self.send_message(merge)
+                self._codeList_.remove(code)
                 print(name, " ", "Message Sent")
             # sleep(1)
+
 
     @property
     def count_(self):
@@ -73,11 +77,9 @@ if __name__ == '__main__':
         ted.get_tick()
         if ted.count_ == 95:
             break
-
-    # ted.get_tick()
+    # while True:
+    #     ted.get_tick()
 
     messagebox.showinfo('股票', '...完成任务...')
     print("---Finished---")
     print("Cound_Left: ", (99 - ted.count_))
-
-

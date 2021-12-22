@@ -1,4 +1,3 @@
-```python
 import requests
 import pandas as pd
 import os
@@ -96,6 +95,3 @@ if __name__ == '__main__':
     messagebox.showinfo('股票', '...完成任务...')
     print("---Finished---")
     print("Cound_Left: ", (99 - ted.count_))
-
-
-```

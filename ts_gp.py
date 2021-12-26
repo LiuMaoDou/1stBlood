@@ -152,6 +152,12 @@ def indus_index(today):
     create_excel_new("股票.xlsx", "行业", today, data, 'pct_change')
 
 
+def etf(today):
+    etf_data = pro.fund_daily(trade_date=today, fields="ts_code, pct_chg, amount")
+    create_excel_new("股票.xlsx", "ETF", today, etf_data, 'pct_chg')
+    create_excel_new("股票.xlsx", "ETF", today, etf_data, 'amount')
+
+
 @timer
 def main():
     # today, ysday = ts_date()
@@ -170,10 +176,11 @@ def main():
 
 
     # daily_pct(today)
-    daily_pct_new(today)
+    # daily_pct_new(today)
     # daily_pct("20211215")
     # daily_pct_new("20211224")
-    indus_index(today)
+    # indus_index(today)
+    etf(today)
 
 
 if __name__ == "__main__":

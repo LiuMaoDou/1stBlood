@@ -1,14 +1,15 @@
 import tushare as ts
 import pandas as pd
+import numpy as np
 import datetime
 import os
 import xlwings as xw
 import time
 from tkinter import messagebox
-
+pd.options.mode.chained_assignment = None
 
 pro = ts.pro_api('**')
-os.chdir('/Users/**/Documents/03 Python/股票')
+os.chdir('/Users/**/Desktop')
 
 
 def timer(function):
@@ -28,9 +29,30 @@ def timer(function):
     return wrapper
 
 
-def gp_list():
-    data = pro.stock_basic(exchange='', list_status='L', fields='ts_code,symbol,name,industry,market,list_date')
-    data.to_excel('股票.xlsx')
+# 每周更新一次股票列表
+def update_gp_list():
+    data = pro.stock_basic(exchange='', list_status='L', fields='ts_code,name,industry,market')
+    # data.to_excel('股票.xlsx')
+    data.replace(np.nan, "无数据", inplace=True)
+
+    df_gp = pd.read_excel('股票.xlsx')
+    newdata = df_gp[['ts_code', 'name', 'industry', 'market']]
+    df_merge = pd.merge(newdata, data, how='outer', on="ts_code")
+    df_merge_n = df_merge.loc[df_merge.isna().any(1)]
+    df_merge_n.drop(['name_x', 'industry_x', 'market_x'], axis=1, inplace=True)
+
+    wb = xw.Book('股票.xlsx')
+    sheet = wb.sheets['股票']
+    num_col = sheet.range('A1').end('right').column
+    num_row = sheet.range('A1').end('down').row
+
+    sheet.range(((num_row + 1), 1)).options(index=False, header=False).value = df_merge_n
+
+    num_row_n = sheet.range('A1').end('down').row
+
+    sheet.range((num_row, 1), (num_row, num_col)).copy()
+    sheet.range((num_row+1, 1), (num_row_n, num_col)).paste("formats")
+    sheet.range((num_row+1, 1), (num_row_n, num_col)).autofit()
 
 
 def ts_date(ttoday=True):
@@ -83,14 +105,16 @@ def create_excel_new(bookname, sheetname, title, df, df_value):
     num_col = sheet.range('A1').end('right').column
     num_row = sheet.range('A1').end('down').row
 
-    df_gp = pd.read_excel(bookname)
-    df_merge = pd.merge(df_gp, df, how='outer', on="ts_code")
+    df_gp = pd.read_excel(bookname, sheet_name=sheetname)
+    # df_merge = pd.merge(df_gp, df, how='outer', on="ts_code")
+    df_merge = pd.merge(df_gp, df, how='left', on="ts_code")
 
     sheet.range((1, (num_col + 1))).options(index=False).value = df_merge[df_value]
     sheet.range((1, (num_col + 1))).value = title
     sheet.range((1, num_col), (num_row, num_col)).copy()
+
     sheet.range((1, (num_col + 1)), (num_row, num_col+1)).paste("formats")
-    sheet.range((1, (num_col + 1)), (num_row, num_col + 1)).autofit()
+    sheet.range((1, (num_col + 1)), (num_row, num_col+1)).autofit()
 
     wb.save(bookname)
     print("---Excel Finished---")
@@ -106,7 +130,8 @@ def daily_pct(date):
 
 def daily_pct_new(date):
     daily = pro.daily(trade_date=date, fields="ts_code,pct_chg,close,amount")
-    create_excel_new("股票.xlsx", "股票", date + "-涨跌", daily, 'pct_chg')
+    create_excel_new("股票.xlsx", "股票", date, daily, 'pct_chg')
+    create_excel_new("股票.xlsx", "股票", '股价', daily, 'close')
 
 
 def reven(year, Q):
@@ -122,26 +147,33 @@ def reven(year, Q):
     create_excel("股票.xlsx", "股票", str(year) + Q + "-利润", reven_value2, "n_income_attr_p")
 
 
+def indus_index(today):
+    data = pro.ths_daily(trade_date=today, fields='ts_code,pct_change')
+    create_excel_new("股票.xlsx", "行业", today, data, 'pct_change')
+
+
 @timer
 def main():
-    today, ysday = ts_date()
-    print("Today is", today)
+    # today, ysday = ts_date()
+    # print("Today is", today)
 
-    # gp_list()
+    # update_gp_list()
     # reven(2021, "Q3")
 
-    ## PE和市值
-    s_pe = pro.daily_basic(ts_code='', trade_date=today, fields='ts_code,pe_ttm,total_mv')
+    today = "20211224"
+    # PE和市值
+    # s_pe = pro.daily_basic(ts_code='', trade_date=today, fields='ts_code,pe_ttm,total_mv')
     # s_pe = s_pe.set_index('ts_code')
-    create_excel_new("股票.xlsx", "股票", "PE", s_pe, "pe_ttm")
-    create_excel_new("股票.xlsx", "股票", "市值", s_pe, "total_mv")
-    ## PE和市值
+    # create_excel_new("股票.xlsx", "股票", "PE", s_pe, "pe_ttm")
+    # create_excel_new("股票.xlsx", "股票", "市值", s_pe, "total_mv")
+    # PE和市值
 
 
     # daily_pct(today)
-    # daily_pct_new(today)
+    daily_pct_new(today)
     # daily_pct("20211215")
-    # daily_pct_new("20211215")
+    # daily_pct_new("20211224")
+    indus_index(today)
 
 
 if __name__ == "__main__":
@@ -149,4 +181,3 @@ if __name__ == "__main__":
     main()
     messagebox.showinfo('股票', '...完成任务...')
     print("---Finished---")
-

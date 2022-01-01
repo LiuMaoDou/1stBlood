@@ -2,7 +2,7 @@ import shutil, os
 from pathlib import Path
 import re
 
-filepath = "/Users/liujiannan/Downloads/rrshare/绝望的主妇第1季"
+filepath = "/Users/**/Downloads/rrshare/绝望的主妇第1季"
 p = Path(filepath)
 
 # 绝望的主妇.Desperate.Housewives.S01E02.Chi_Eng.HR-HDTV.AAC.1024X576.x264-YYeTs人人影视

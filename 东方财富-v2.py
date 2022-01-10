@@ -56,9 +56,11 @@ def get_data(url, cb, fields):
 if __name__ == "__main__":
     lb_df = get_data(lb_url, lb_cb, lb_fields)
     df = pd.DataFrame(lb_df)
-    df.columns = ['名称', '代码', '量比']
-    time = datetime.now().time().strftime('%H:%M:%S')
-    df.insert(0, "时间", time)
+    df.columns = ['量比', '代码', '名称']
+    time_t = datetime.now().time().strftime('%H:%M:%S')
+    df = df[['代码', '名称', '量比']]
+    df.insert(0, "时间", time_t)
+
 
     # while datetime.now().time() < time(15, 0):
     #     if datetime.now().time() < time(9,30):
@@ -68,8 +70,9 @@ if __name__ == "__main__":
     #     if time(11, 30) < datetime.now().time() < time(12, 55):
     #         sleep(5410)
     #
-    #     time = datetime.now().time().strftime('%H:%M:%S')
-
+    #     time_t = datetime.now().time().strftime('%H:%M:%S')
+    #     df.insert(0, "时间", time_t)
+    #     sleep(60)
 
     print(df)
     print('------Finished------')

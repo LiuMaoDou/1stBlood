@@ -66,8 +66,9 @@ class NetworkServer:
                     print("[*]接收文件信息...要保存到：", file_name)
                     print("--------------------------------")
                     self.__recv_file(conn, file_name)
+                    print("\n--------------------------------")
                     print("[√接收文件信息完成...")
-                    print("--------------------------------")
+
 
             conn.close()
         sock.close()
@@ -201,31 +202,15 @@ class NetworkClient:
         print("[*]发送报文头信息...")
         self.__send_data(client, json.dumps({"msg_type": "file", 'file_name': file_name}))
         print("[√]发送报文头信息完成...")
-        
+
         print("[*]发送文件信息...")
         print("--------------------------------")
         self.__send_data_file(client, file_path)
-        print("--------------------------------")
+        print("\n--------------------------------")
         print("[√]发送文件完成...")
-        
-        
+
+
         self.__send_data(client, 'close')
         client.close()
-
-
-
-
-
-# ######################## Server Side #########################
-# from NetTrans import NetworkServer
-# server = NetworkServer('127.0.0.1', 12345)
-# server.server_start()
-
-# ######################## Client Side #########################
-# from NetTrans import NetworkClient
-
-# client = NetworkClient('127.0.0.1', 12345)
-# client.send_text()
-# client.send_file()
 
 

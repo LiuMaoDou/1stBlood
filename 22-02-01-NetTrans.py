@@ -184,4 +184,16 @@ class NetworkClient:
 
         client.close()
 
+# ######################## Server Side #########################
+# from NetTrans import NetworkServer
+# server = NetworkServer('127.0.0.1', 12345)
+# server.server_start()
+
+# ######################## Client Side #########################
+# from NetTrans import NetworkClient
+
+# client = NetworkClient('127.0.0.1', 12345)
+# client.send_text()
+# client.send_file()
+
 

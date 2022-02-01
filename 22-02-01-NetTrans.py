@@ -39,8 +39,11 @@ class NetworkServer:
         sock.bind((self.ip, self.port))
         sock.listen(5)
         print("The Server has been started...")
+
         while True:
+            print("Waiting for a connection...")
             conn, addr = sock.accept()
+            print(f"Connection established and the address is from {addr}")
 
             while True:
                 # 获取消息类型
@@ -53,37 +56,39 @@ class NetworkServer:
                 message_type_info = json.loads(message_type)
                 if message_type_info['msg_type'] == 'msg':
                     data = self.__recv_data(conn)
-                    print("接收到消息")
-                    print("--------------------------------")
-                    print(data.decode('utf-8'))
                     pyperclip.copy(data.decode('utf-8'))
-                    print("--------------------------------")
-                    print("消息接收完毕...")
 
                 else:
                     file_name = message_type_info['file_name']
                     print("接收到文件，要保存到：", file_name)
                     self.__recv_file(conn, file_name)
 
+
             conn.close()
         sock.close()
 
     @staticmethod
     def __recv_data(conn, chunk_size=1024):
+        print("开始接收到消息...")
         # 获取头部信息：数据长度
         has_read_size = 0
         bytes_list = []
+        print("接收报文头消息...")
         while has_read_size < 4:
             chunk = conn.recv(4 - has_read_size)
             has_read_size += len(chunk)
             bytes_list.append(chunk)
         header = b"".join(bytes_list)
         data_length = struct.unpack('i', header)[0]
-
+        print("--------------------------------")
+        print("接收报文头消息完成...")
+        
+        
         # 获取数据
         data_list = []
         has_read_data_size = 0
-
+        print("接收报文消息...")
+        print("--------------------------------")
         while has_read_data_size < data_length:
             size = chunk_size if (data_length - has_read_data_size) > chunk_size else data_length - has_read_data_size
             chunk = conn.recv(size)
@@ -91,7 +96,10 @@ class NetworkServer:
             has_read_data_size += len(chunk)
 
         data = b"".join(data_list)
-        print(data)
+        
+        print(data.decode('utf-8'))
+        print("--------------------------------")
+        print("接收报文消息完毕...")
         return data
 
 
@@ -160,16 +168,19 @@ class NetworkClient:
         file_object.close()
         print("\nFile sent finished...")
 
+
     def send_text(self):
         client = socket.socket()
         client.connect((self.ip, self.port))
 
         data = pyperclip.paste()
-        print(data)
+        print("发送报文头信息...")
         self.__send_data(client, json.dumps({"msg_type": "msg"}))
+        print("发送文本信息...")
         self.__send_data(client, data)
+        print(data)
         client.close()
-        print("Message Sent Done")
+        print("发送信息完成...")
 
 
     def send_file(self):
@@ -184,6 +195,9 @@ class NetworkClient:
         self.__send_data_file(client, file_path)
 
         client.close()
+
+
+
 
 # ######################## Server Side #########################
 # from NetTrans import NetworkServer

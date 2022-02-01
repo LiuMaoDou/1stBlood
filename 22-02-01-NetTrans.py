@@ -174,7 +174,8 @@ class NetworkClient:
 
     def send_file(self):
         file_path = input_file_path()
-        file_name = file_path.rsplit(os.sep, maxsplit=1)[-1]
+        # file_name = file_path.rsplit(os.sep, maxsplit=1)[-1]
+        file_name = file_path.rsplit('/', maxsplit=1)[-1]
 
         client = socket.socket()
         client.connect((self.ip, self.port))

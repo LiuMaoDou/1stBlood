@@ -48,9 +48,11 @@ class NetworkServer:
             while True:
                 # 获取消息类型
                 message_type = self.__recv_data(conn).decode('utf-8')
+
                 if message_type == 'close':  # 四次挥手，空内容。
                     print("关闭连接")
                     break
+
                 # 文件：{'msg_type':'file', 'file_name':"xxxx.xx" }
                 # 消息：{'msg_type':'msg'}
                 message_type_info = json.loads(message_type)
@@ -69,25 +71,24 @@ class NetworkServer:
 
     @staticmethod
     def __recv_data(conn, chunk_size=1024):
-        print("开始接收到消息...")
+        print("接收到消息...")
         # 获取头部信息：数据长度
         has_read_size = 0
         bytes_list = []
-        print("接收报文头消息...")
+        print("[*]接收报文头消息...")
         while has_read_size < 4:
             chunk = conn.recv(4 - has_read_size)
             has_read_size += len(chunk)
             bytes_list.append(chunk)
         header = b"".join(bytes_list)
         data_length = struct.unpack('i', header)[0]
-        print("--------------------------------")
-        print("接收报文头消息完成...")
-        
-        
+        print("[√]接收报文头消息完成...")
+
+
         # 获取数据
         data_list = []
         has_read_data_size = 0
-        print("接收报文消息...")
+        print("[*]接收报文消息...")
         print("--------------------------------")
         while has_read_data_size < data_length:
             size = chunk_size if (data_length - has_read_data_size) > chunk_size else data_length - has_read_data_size
@@ -96,10 +97,10 @@ class NetworkServer:
             has_read_data_size += len(chunk)
 
         data = b"".join(data_list)
-        
+
         print(data.decode('utf-8'))
         print("--------------------------------")
-        print("接收报文消息完毕...")
+        print("[√]接收报文消息完成...")
         return data
 
 
@@ -176,10 +177,14 @@ class NetworkClient:
         data = pyperclip.paste()
         print("发送报文头信息...")
         self.__send_data(client, json.dumps({"msg_type": "msg"}))
+        print("发送报文头信息完成...")
+
         print("发送文本信息...")
+        print("--------------------------------")
         self.__send_data(client, data)
         print(data)
         client.close()
+        print("--------------------------------")
         print("发送信息完成...")
 
 

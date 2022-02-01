@@ -155,7 +155,7 @@ class NetworkClient:
 
             percent = round((int(has_send_size) / int(file_size)) * 100, 3)
             # time.sleep(0.0001)
-            print("\r文件总大小为：{}字节，已下载{}字节, 进度{}%".format(file_size, has_send_size, percent), end="")
+            print("\r文件总大小为：{}字节，已发送{}字节, 进度{}%".format(file_size, has_send_size, percent), end="")
 
         file_object.close()
         print("\nFile sent finished...")

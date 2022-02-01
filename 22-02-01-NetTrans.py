@@ -62,9 +62,12 @@ class NetworkServer:
 
                 else:
                     file_name = message_type_info['file_name']
-                    print("接收到文件，要保存到：", file_name)
-                    self.__recv_file(conn, file_name)
 
+                    print("[*]接收文件信息...要保存到：", file_name)
+                    print("--------------------------------")
+                    self.__recv_file(conn, file_name)
+                    print("[√接收文件信息完成...")
+                    print("--------------------------------")
 
             conn.close()
         sock.close()
@@ -119,7 +122,6 @@ class NetworkServer:
         # 获取数据
         file_object = open(save_file_path, mode='wb')
         has_read_data_size = 0
-        print("File receive started...")
         while has_read_data_size < data_length:
             size = chunk_size if (data_length - has_read_data_size) > chunk_size else data_length - has_read_data_size
             chunk = conn.recv(size)
@@ -131,7 +133,6 @@ class NetworkServer:
             # time.sleep(0.0001)
             print("\r文件总大小为：{}字节，已下载{}字节, 进度{}%".format(data_length, has_read_data_size, percent), end="")
         file_object.close()
-        print("\nFile receive finished...")
 
 
 class NetworkClient:
@@ -156,7 +157,6 @@ class NetworkClient:
 
         has_send_size = 0
         file_object = open(file_path, mode='rb')
-        print("File sent started...")
         while has_send_size < file_size:
             chunk = file_object.read(2048)
             conn.sendall(chunk)
@@ -167,7 +167,7 @@ class NetworkClient:
             print("\r文件总大小为：{}字节，已发送{}字节, 进度{}%".format(file_size, has_send_size, percent), end="")
 
         file_object.close()
-        print("\nFile sent finished...")
+
 
 
     def send_text(self):
@@ -175,17 +175,19 @@ class NetworkClient:
         client.connect((self.ip, self.port))
 
         data = pyperclip.paste()
-        print("发送报文头信息...")
+        print("[*]发送报文头信息...")
         self.__send_data(client, json.dumps({"msg_type": "msg"}))
-        print("发送报文头信息完成...")
+        print("[√]发送报文头信息完成...")
 
-        print("发送文本信息...")
+        print("[*]发送文本信息...")
         print("--------------------------------")
         self.__send_data(client, data)
         print(data)
-        client.close()
         print("--------------------------------")
-        print("发送信息完成...")
+        print("[√]发送信息完成...")
+
+        self.__send_data(client, 'close')
+        client.close()
 
 
     def send_file(self):
@@ -196,10 +198,20 @@ class NetworkClient:
         client = socket.socket()
         client.connect((self.ip, self.port))
 
+        print("[*]发送报文头信息...")
         self.__send_data(client, json.dumps({"msg_type": "file", 'file_name': file_name}))
+        print("[√]发送报文头信息完成...")
+        
+        print("[*]发送文件信息...")
+        print("--------------------------------")
         self.__send_data_file(client, file_path)
-
+        print("--------------------------------")
+        print("[√]发送文件完成...")
+        
+        
+        self.__send_data(client, 'close')
         client.close()
+
 
 
 

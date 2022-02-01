@@ -67,7 +67,7 @@ class NetworkServer:
                     print("--------------------------------")
                     self.__recv_file(conn, file_name)
                     print("\n--------------------------------")
-                    print("[√接收文件信息完成...")
+                    print("[√]接收文件信息完成...")
 
 
             conn.close()

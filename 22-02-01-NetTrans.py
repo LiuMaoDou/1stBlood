@@ -20,7 +20,7 @@ def input_file_path():
                                         initialdir=os.getcwd(),
                                         title="Please select a file:",
                                         filetypes=[('all files', '.*')])
-
+    window.destroy()
     return inpath
 
 

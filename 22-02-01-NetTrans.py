@@ -3,9 +3,8 @@ import json
 import socket
 import struct
 import pyperclip
-import time
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 
 
 def input_file_path():
@@ -69,7 +68,6 @@ class NetworkServer:
                     print("\n--------------------------------")
                     print("[√]接收文件信息完成...")
 
-
             conn.close()
         sock.close()
 
@@ -88,7 +86,6 @@ class NetworkServer:
         data_length = struct.unpack('i', header)[0]
         print("[√]接收报文头消息完成...")
 
-
         # 获取数据
         data_list = []
         has_read_data_size = 0
@@ -106,7 +103,6 @@ class NetworkServer:
         print("--------------------------------")
         print("[√]接收报文消息完成...")
         return data
-
 
     def __recv_file(self, conn, save_file_name, chunk_size=1024):
         save_file_path = os.path.join(self.SERVER_FILE_PATH, save_file_name)
@@ -131,7 +127,6 @@ class NetworkServer:
             has_read_data_size += len(chunk)
 
             percent = round((int(has_read_data_size) / int(data_length)) * 100, 3)
-            # time.sleep(0.0001)
             print("\r文件总大小为：{}字节，已下载{}字节, 进度{}%".format(data_length, has_read_data_size, percent), end="")
         file_object.close()
 
@@ -149,7 +144,6 @@ class NetworkClient:
         conn.sendall(header)
         conn.sendall(data)
 
-
     @staticmethod
     def __send_data_file(conn, file_path):
         file_size = os.stat(file_path).st_size
@@ -164,32 +158,35 @@ class NetworkClient:
             has_send_size += len(chunk)
 
             percent = round((int(has_send_size) / int(file_size)) * 100, 3)
-            # time.sleep(0.0001)
             print("\r文件总大小为：{}字节，已发送{}字节, 进度{}%".format(file_size, has_send_size, percent), end="")
 
         file_object.close()
-
-
 
     def send_text(self):
         client = socket.socket()
         client.connect((self.ip, self.port))
 
-        data = pyperclip.paste()
         print("[*]发送报文头信息...")
         self.__send_data(client, json.dumps({"msg_type": "msg"}))
         print("[√]发送报文头信息完成...")
-
+        __data = pyperclip.paste()
         print("[*]发送文本信息...")
         print("--------------------------------")
-        self.__send_data(client, data)
-        print(data)
+        self.__send_data(client, __data)
+        print(__data)
         print("--------------------------------")
         print("[√]发送信息完成...")
 
         self.__send_data(client, 'close')
         client.close()
 
+
+    def send_close(self):
+        client = socket.socket()
+        client.connect((self.ip, self.port))
+        self.__send_data(client, "关闭")
+        print('发送关闭完成')
+        client.close()
 
     def send_file(self):
         file_path = input_file_path()
@@ -209,8 +206,5 @@ class NetworkClient:
         print("\n--------------------------------")
         print("[√]发送文件完成...")
 
-
         self.__send_data(client, 'close')
         client.close()
-
-

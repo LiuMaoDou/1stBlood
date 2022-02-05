@@ -12,8 +12,7 @@ def input_file_path():
     window.title('(^_^))')
     window.geometry('220x20')
 
-    l = tk.Label(window, text='"Pls Select The File"')
-    l.pack()
+    tk.Label(window, text='"Pls Select The File"').pack()
 
     inpath = filedialog.askopenfilename(parent=window,
                                         initialdir=os.getcwd(),
